@@ -1,0 +1,32 @@
+{
+  "name": "markdown-github-status",
+  "version": "1.0.0",
+  "description": "Update github statuses form awesome MD",
+  "main": "src/index.js",
+  "author": "eGust",
+  "license": "MIT",
+  "engines": {
+    "node": ">=8.9"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "s": "node src/index.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "chalk": "^2.3.2",
+    "clui": "^0.3.6",
+    "lodash": "^4.17.5",
+    "lowdb": "^1.0.0",
+    "mkdirp": "^0.5.1"
+  },
+  "devDependencies": {
+    "eslint": "^4.18.2",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-friendly-formatter": "^3.0.0",
+    "eslint-plugin-import": "^2.9.0",
+    "eslint-plugin-jest": "^21.12.3",
+    "jest": "^22.4.2"
+  }
+}
