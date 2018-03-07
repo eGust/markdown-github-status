@@ -50,6 +50,10 @@ class WorkerManager {
             case 'FINISHED': case 'NO_TOKEN': {
               return error;
             }
+            case 'ERR.NETWORK': {
+              await sleep();
+              return executor();
+            }
             default: {
               console.error(rawError);
               await sleep();
@@ -91,7 +95,7 @@ class WorkerManager {
     }
     if (status.remaining > this.reservedLimit) return token;
 
-    if (_.length(tried) >= this.authCount - 1) throw 'NO_TOKEN';
+    if (_.size(tried) >= this.authCount - 1) throw 'NO_TOKEN';
     return this.acquireAuthToken(
       authId >= this.authCount ? 0 : authId + 1,
       { ...tried, [authId]: 1 },
