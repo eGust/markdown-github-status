@@ -7,8 +7,6 @@ const WorkerManager = require('./WorkerManager');
 
 async function main() {
   const db = await getDatabase(settings.db);
-  debugger;
-  if (true) return;
   const data = await fetchMarkdownDocuments(settings.repositories);
   fs.writeFileSync('./tmp/md.json', JSON.stringify(data, null, '\t'));
 

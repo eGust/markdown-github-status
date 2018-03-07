@@ -1,4 +1,4 @@
-module.exports = (timeout = 50) => new Promise((resolve) => {
+module.exports = (timeout = 300) => new Promise((resolve) => {
   const timer = setTimeout(() => {
     clearTimeout(timer);
     resolve();

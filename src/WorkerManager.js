@@ -24,8 +24,9 @@ class WorkerManager {
     this.tokenStatus = {};
     this.authIndex = 0;
     this.authCount = authTokens.length;
+    const reservedLimit = limitReserve + workers;
 
-    Object.assign(this, { ...settings, limitReserve, tryLimit });
+    Object.assign(this, { ...settings, reservedLimit, tryLimit });
     this.createWorkers(workers);
 
     this.repoCursor = 0;
@@ -34,35 +35,36 @@ class WorkerManager {
   }
 
   async run() {
-    await Promise.all(_.times(this.workerCount, (workerId) => {
-      const worker = this.workers[workerId];
-      return new Promise((resolve) => {
-        const executor = async (args = {}) => {
-          try {
-            await worker(args);
-            await sleep();
-            return executor();
-          } catch (err) {
-            const { error, rawError = null, ...payload } = err;
-            switch (error) {
-              case 'FINISHED': case 'NO_TOKEN': {
-                return null;
-              }
-              default: {
-                console.error(rawError);
-                await sleep();
-                return executor(payload);
-              }
+    console.log(`start ${this.workers.length} workers`);
+    const preToken = await this.acquireAuthToken();
+    console.log(preToken);
+    return Promise.all(_.map(this.workers, (worker, workerId) => new Promise((resolve) => {
+      const executor = async (args = {}) => {
+        try {
+          await worker(args);
+          await sleep();
+          return executor();
+        } catch (err) {
+          const { error, rawError = null, ...payload } = err;
+          switch (error) {
+            case 'FINISHED': case 'NO_TOKEN': {
+              return error;
+            }
+            default: {
+              console.error(rawError);
+              await sleep();
+              return executor(payload);
             }
           }
-        };
+        }
+      };
 
-        (async () => {
-          await executor();
-          resolve();
-        })();
-      });
-    }));
+      (async () => {
+        console.log(`Fire worker ${workerId}`);
+        await executor();
+        resolve();
+      })();
+    })));
   }
 
   async acquireNextRepo() {
@@ -83,11 +85,11 @@ class WorkerManager {
     const authId = start === null ? this.authIndex : start;
     const token = this.tokens[authId];
     let status = this.tokenStatus[token];
-    if ((!status) || status.reset < Date.now()) {
+    if (!status || status.reset < Date.now()) {
       await this.fetch(URL_RATE_LIMIT, token);
       status = this.tokenStatus[token];
     }
-    if (status.remaining > this.limitReserve) return token;
+    if (status.remaining > this.reservedLimit) return token;
 
     if (_.length(tried) >= this.authCount - 1) throw 'NO_TOKEN';
     return this.acquireAuthToken(
@@ -101,10 +103,15 @@ class WorkerManager {
       headers: { Authorization: `token ${token}` },
     });
 
-    this.tokenStatus[token] = {
+    const old = this.tokenStatus[token];
+    const status = {
       remaining: headers['x-ratelimit-remaining'] | 0,
       reset: headers['x-ratelimit-reset'] * 1000,
     };
+
+    if (!old || old.reset < status.reset || status.remaining < old.remaining) {
+      this.tokenStatus[token] = status;
+    }
     return data;
   }
 
@@ -113,20 +120,21 @@ class WorkerManager {
   }
 
   createWorkers(workerCount) {
-    this.workers = _.times(workerCount, () => payload => new Promise((resolve, reject) => {
+    this.workers = _.times(workerCount, workerId => payload => new Promise((resolve, reject) => {
       let { tried = 0, repo = null } = payload;
-      try {
-        tried += 1;
-        (async () => {
+      (async () => {
+        try {
+          tried += 1;
           repo = repo || await this.acquireNextRepo();
           const token = await this.acquireAuthToken();
           const timestamp = Date.now();
           try {
+            console.log(`[worker ${workerId}] - fetch ${repo}`);
             const {
               stargazers_count: stars,
               subscribers_count: eyes,
               forks,
-            } = this.fetch(`https://api.github.com/repos/${repo}`, token);
+            } = await this.fetch(`https://api.github.com/repos/${repo}`, token);
 
             this.updateRepo({
               repo,
@@ -138,6 +146,7 @@ class WorkerManager {
             });
             resolve();
           } catch (rawError) {
+            console.log(`[worker ${workerId}] FAILED ${repo}: ${rawError}`);
             if (tried < this.tryLimit) {
               reject({
                 error: 'NETWORK',
@@ -153,10 +162,11 @@ class WorkerManager {
               timestamp,
             });
           }
-        })();
-      } catch (error) {
-        reject({ error });
-      }
+        } catch (error) {
+          console.log(`[worker ${workerId}] ERROR ${error}`);
+          reject({ error });
+        }
+      })();
     }));
   }
 }
