@@ -50,7 +50,7 @@ class WorkerManager {
             case 'FINISHED': case 'NO_TOKEN': {
               return error;
             }
-            case 'ERR.NETWORK': {
+            case 'FAILED': {
               await sleep();
               return executor();
             }
@@ -165,6 +165,7 @@ class WorkerManager {
               state: 'ERR.NETWORK',
               timestamp,
             });
+            reject({ error: 'FAILED', rawError });
           }
         } catch (error) {
           console.log(`[worker ${workerId}] ERROR ${error}`);

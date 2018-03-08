@@ -1,7 +1,10 @@
+const fs = require('fs');
+const path = require('path');
 const axios = require('axios');
 const _ = require('lodash');
+const mkdirp = require('./mkdirp');
 
-const RE_GITHUB = /^\s*[-+*]\s+\[.+?\]\(https:\/\/github.com\/([^/]+\/[^/)]+)\)/;
+const RE_GITHUB = /^\s*[-+*]\s+\[.+?\]\(https:\/\/github.com\/([^/]+\/[^/)]+?)(?:\.git)?\)/;
 
 module.exports = async (repositories) => {
   const markdowns = {};
@@ -11,6 +14,16 @@ module.exports = async (repositories) => {
     console.log(`fetch: ${repo}/${markdown} (${url})`);
     const req = axios.get(url)
       .then(({ data }) => {
+        const tmpDir = path.resolve(__dirname, `../tmp/${repo}`);
+        mkdirp(tmpDir)
+          .then((err) => {
+            if (err) {
+              console.log(err);
+            } else {
+              fs.writeFile(`${tmpDir}/${markdown}`, data);
+            }
+          });
+
         const lines = data.split('\n').map(ln => ln.trim());
         const githubItems = {};
         _.each(lines, (line, index) => {
