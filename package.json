@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "author": "eGust",
   "license": "MIT",
+  "repository": "github:eGust/markdown-github-status",
   "engines": {
     "node": ">=8.9"
   },

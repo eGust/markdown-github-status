@@ -4,6 +4,7 @@ const axios = require('axios');
 const _ = require('lodash');
 const mkdirp = require('./mkdirp');
 
+const RE_ITEM = /^\s*[-+*]\s+\[.+?\]\(https?:\/\//;
 const RE_GITHUB = /^\s*[-+*]\s+\[.+?\]\(https:\/\/github.com\/([^/]+\/[^/)]+?)(?:\.git)?\)/;
 
 module.exports = async (repositories) => {
@@ -16,28 +17,36 @@ module.exports = async (repositories) => {
       .then(({ data }) => {
         const tmpDir = path.resolve(__dirname, `../tmp/${repo}`);
         mkdirp(tmpDir)
-          .then((err) => {
-            if (err) {
-              console.log(err);
-            } else {
-              fs.writeFile(`${tmpDir}/${markdown}`, data);
-            }
-          });
+          .then(() => {
+            fs.writeFile(`${tmpDir}/${markdown}`, data, () => {});
+          })
+          .catch(console.log);
 
-        const lines = data.split('\n').map(ln => ln.trim());
-        const githubItems = {};
-        _.each(lines, (line, index) => {
-          const matches = line.match(RE_GITHUB);
-          if (!matches) return;
+        const githubItems = [];
+        const groups = [];
+        let group = { repo: null };
+        data.split('\n').forEach((line) => {
+          const isItem = !!line.match(RE_ITEM);
+          if (isItem !== group.isItem) {
+            group = {
+              isItem,
+              lines: [],
+            };
+            groups.push(group);
+          }
 
-          const entry = matches[1];
-          githubItems[entry] = {
-            index,
-            entry,
-          };
+          if (isItem) {
+            const matches = line.match(RE_GITHUB);
+            const ref = matches && matches[1];
+            if (ref) githubItems.push(ref);
+            group.lines.push({ line, ref });
+          } else {
+            group.lines.push(line);
+          }
         });
         markdowns[repo] = {
-          lines,
+          markdown,
+          groups,
           githubItems,
         };
       });
@@ -52,8 +61,8 @@ module.exports = async (repositories) => {
   const projects = {};
 
   _.each(data.markdowns, ({ githubItems }) => {
-    Object.keys(githubItems).forEach((k) => {
-      projects[k] = 0;
+    _.each(githubItems, (repo) => {
+      projects[repo] = 0;
     });
   });
   Object.keys(projects).sort().forEach((k) => { data.repositories[k] = {}; });
