@@ -1,16 +1,17 @@
 # Watched repos
 
 1. [awesome-react](dist/enaqx/awesome-react) - React [original](https://github.com/enaqx/awesome-react)
-2. [awesome-vue](dist/vuejs/awesome-vue) - Vue [original](https://github.com/vuejs/awesome-vue)
-3. [awesome-react-native](dist/jondot/awesome-react-native) - React-Native [original](https://github.com/jondot/awesome-react)
+1. [awesome-vue](dist/vuejs/awesome-vue) - Vue [original](https://github.com/vuejs/awesome-vue)
+1. [awesome-electron](dist/sindresorhus/awesome-electron) - Vue [original](https://github.com/sindresorhus/awesome-electron)
+1. [awesome-flutter](dist/Solido/awesome-flutter) - Vue [original](https://github.com/Solido/awesome-flutter)
 
-> Updated at **2018-07-22 03:15@UTC**
+> Updated at **2018-12-04 09:10@UTC**
 
 ---
 
 # markdown-github-status
-> Update awesome markdowns github statuses
 
+> Update awesome markdowns github statuses
 
 ## Requirements
 
