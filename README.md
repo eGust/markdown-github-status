@@ -5,7 +5,7 @@
 1. [awesome-electron](dist/sindresorhus/awesome-electron) - Electron [original](https://github.com/sindresorhus/awesome-electron)
 1. [awesome-flutter](dist/Solido/awesome-flutter) - Flutter [original](https://github.com/Solido/awesome-flutter)
 
-> Updated at **2018-12-04 09:10@UTC**
+> Updated at **2019-02-06 00:16@UTC**
 
 ---
 
