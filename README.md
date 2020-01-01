@@ -1,4 +1,8 @@
-# Watched repos
+# markdown-github-status
+
+> Update awesome markdowns github statuses
+
+## Watched repos
 
 1. [awesome-electron](dist/sindresorhus/awesome-electron) - Electron [original](https://github.com/sindresorhus/awesome-electron)
 1. [awesome-flutter](dist/Solido/awesome-flutter) - Flutter [original](https://github.com/Solido/awesome-flutter)
@@ -6,19 +10,16 @@
 1. [awesome-rust](dist/rust-unofficial/awesome-rust) - Rust [original](https://github.com/rust-unofficial/awesome-rust)
 1. [awesome-vue](dist/vuejs/awesome-vue) - Vue [original](https://github.com/vuejs/awesome-vue)
 
-> Updated at **2019-05-31 07:30@UTC**
+> Updated at **2020-01-01 01:00@UTC**
 
 ---
-
-# markdown-github-status
-
-> Update awesome markdowns github statuses
 
 ## Requirements
 
 1. Get [git](https://git-scm.com/) installed
 1. Install [node.js](https://nodejs.org)
 1. Sign up [Github](https://github.com) account
+
 * Optional: install [yarn](https://yarnpkg.com)
 
 ## Usage

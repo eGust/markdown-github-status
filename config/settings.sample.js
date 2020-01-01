@@ -7,9 +7,11 @@ module.exports = {
   ],
   sorting: ['stars'],
   repositories: {
-    'enaqx/awesome-react': null, // default 'README.md'
-    'vuejs/awesome-vue': 'README.md',
-    'jondot/awesome-react-native': 'README.md',
+    'sindresorhus/awesome-electron': 'readme.md', // default 'README.md'
+    'Solido/awesome-flutter': 'README.md',
+    'enaqx/awesome-react': null,
+    'rust-unofficial/awesome-rust': null,
+    'vuejs/awesome-vue': null,
   },
   db: path.resolve(__dirname, '../database/db.json'),
 };
