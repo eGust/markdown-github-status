@@ -10,7 +10,7 @@
 1. [awesome-rust](dist/rust-unofficial/awesome-rust) - Rust [original](https://github.com/rust-unofficial/awesome-rust)
 1. [awesome-vue](dist/vuejs/awesome-vue) - Vue [original](https://github.com/vuejs/awesome-vue)
 
-> Updated at **2020-01-01 01:00@UTC**
+> Updated at **2020-03-07 01:30@UTC**
 
 ---
 
