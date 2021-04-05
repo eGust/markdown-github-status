@@ -4,14 +4,13 @@
 
 ## Watched repos
 
-1. [awesome-electron](dist/sindresorhus/awesome-electron) - Electron [original](https://github.com/sindresorhus/awesome-electron)
 1. [awesome-react](dist/enaqx/awesome-react) - React [original](https://github.com/enaqx/awesome-react)
 1. [awesome-rust](dist/rust-unofficial/awesome-rust) - Rust [original](https://github.com/rust-unofficial/awesome-rust)
-1. [awesome-vue](dist/vuejs/awesome-vue) - Vue [original](https://github.com/vuejs/awesome-vue)
-1. [awesome-react-components](dist/brillout/awesome-react-components) - React Components [original](https://github.com/brillout/awesome-react-components)
+1. [awesome-electron](dist/sindresorhus/awesome-electron) - Electron [original](https://github.com/sindresorhus/awesome-electron)
 1. [awesome-flutter](dist/Solido/awesome-flutter) - Flutter [original](https://github.com/Solido/awesome-flutter)
+1. [awesome-vue](dist/vuejs/awesome-vue) - Vue [original](https://github.com/vuejs/awesome-vue)
 
-> Updated at **2020-03-07 01:30@UTC**
+> Updated at **2021-04-05 04:00@UTC**
 
 ---
 

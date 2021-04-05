@@ -7,8 +7,11 @@ module.exports = {
   ],
   sorting: ['stars'],
   repositories: {
-    'sindresorhus/awesome-electron': 'readme.md', // default 'README.md'
-    'Solido/awesome-flutter': 'README.md',
+    'sindresorhus/awesome-electron': {
+      branch: 'main', // default 'master'
+      readme: 'readme.md', // default 'README.md'
+    }, // default 'README.md'
+    'Solido/awesome-flutter': null,
     'enaqx/awesome-react': null,
     'rust-unofficial/awesome-rust': null,
     'vuejs/awesome-vue': null,

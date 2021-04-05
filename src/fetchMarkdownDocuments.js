@@ -1,7 +1,10 @@
-const fs = require('fs');
+const { writeFile } = require('fs');
 const path = require('path');
 const axios = require('axios');
 const _ = require('lodash');
+const { promisify } = require('util');
+
+const writeFileAsync = promisify(writeFile);
 const mkdirp = require('./mkdirp');
 
 const RE_ITEM = /^\s*[-+*]\s+\[.+?\]\(https?:\/\//;
@@ -9,62 +12,63 @@ const RE_GITHUB = /^\s*[-+*]\s+\[.+?\]\(https:\/\/github.com\/([^/]+\/[^/)]+?)(?
 
 module.exports = async (repositories) => {
   const markdowns = {};
-  await Promise.all(_.map(repositories, (md, repo) => {
-    const markdown = md || 'README.md';
-    const url = `https://github.com/${repo}/raw/master/${markdown}`;
-    console.log(`fetch: ${repo}/${markdown} (${url})`);
-    const req = axios.get(url)
-      .then(({ data }) => {
-        const tmpDir = path.resolve(__dirname, `../tmp/${repo}`);
-        mkdirp(tmpDir)
-          .then(() => {
-            fs.writeFile(`${tmpDir}/${markdown}`, data, () => {});
-          })
-          .catch(console.log);
+  await Promise.all(_.map(repositories, async (options, repo) => {
+    const { readme = 'README.md', branch = 'master' } = options || {};
+    const url = `https://github.com/${repo}/raw/${branch}/${readme}`;
+    console.log(`fetch: ${repo}/${readme} (${url})`);
 
-        const githubItems = [];
-        const groups = [];
-        let group = { repo: null };
-        data.split('\n').forEach((line) => {
-          const isItem = !!line.match(RE_ITEM);
-          if (isItem !== group.isItem) {
-            group = {
-              isItem,
-              lines: [],
-            };
-            groups.push(group);
-          }
+    try {
+      const { data } = await axios.get(url);
+      const tmpDir = path.resolve(__dirname, `../tmp/${repo}`);
 
-          if (isItem) {
-            const matches = line.match(RE_GITHUB);
-            const ref = matches && matches[1];
-            if (ref) githubItems.push(ref);
-            group.lines.push({ line, ref });
-          } else {
-            group.lines.push(line);
-          }
-        });
-        markdowns[repo] = {
-          markdown,
-          groups,
-          githubItems,
-        };
+      await mkdirp(tmpDir);
+      await writeFileAsync(`${tmpDir}/${readme}`, data);
+
+      const githubItems = [];
+      const groups = [];
+      let group = { repo: null };
+      data.split('\n').forEach((line) => {
+        const isItem = !!line.match(RE_ITEM);
+        if (isItem !== group.isItem) {
+          group = {
+            isItem,
+            lines: [],
+          };
+          groups.push(group);
+        }
+
+        if (isItem) {
+          const matches = line.match(RE_GITHUB);
+          const ref = matches && matches[1];
+          if (ref) githubItems.push(ref);
+          group.lines.push({ line, ref });
+        } else {
+          group.lines.push(line);
+        }
       });
-    return req;
+      markdowns[repo] = {
+        markdown: readme,
+        groups,
+        githubItems,
+      };
+    } catch (e) {
+      console.error(e.message, url);
+      throw e;
+    }
   }));
 
-  const data = {
+  const d = {
     timestamp: Date.now(),
     repositories: {},
     markdowns,
   };
   const projects = {};
 
-  _.each(data.markdowns, ({ githubItems }) => {
+  _.each(d.markdowns, ({ githubItems }) => {
     _.each(githubItems, (repo) => {
       projects[repo] = 0;
     });
   });
-  Object.keys(projects).sort().forEach((k) => { data.repositories[k] = {}; });
-  return data;
+  Object.keys(projects).sort().forEach((k) => { d.repositories[k] = {}; });
+  return d;
 };
